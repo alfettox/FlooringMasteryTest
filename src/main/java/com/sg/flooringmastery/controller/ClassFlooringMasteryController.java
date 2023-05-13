@@ -32,6 +32,7 @@ public class ClassFlooringMasteryController {
     public void run() throws Exception {
         boolean keepGoing = true;
         int menuSelection = 99;
+        service.loadOrders();
 //        try {
             do {
                 menuSelection = getMenuSelection();
@@ -74,6 +75,7 @@ public class ClassFlooringMasteryController {
     private void addOrder() {
         Order curOrder = view.addOrder();
         service.completeOrderFields(curOrder);
+
 
     }
 

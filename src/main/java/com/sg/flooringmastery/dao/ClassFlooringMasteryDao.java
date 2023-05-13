@@ -25,4 +25,8 @@ public interface ClassFlooringMasteryDao {
     List<Order> getAllOrders() throws Exception;
 
     Order addOrder();
+
+    void loadOrders() throws Exception;
+
+    void saveOrder(Order curOrder);
 }

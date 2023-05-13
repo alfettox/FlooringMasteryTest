@@ -63,8 +63,8 @@ public class ClassFlooringMasteryView {
 
     public Order addOrder() {
         String customerName = io.readString("Enter Customer Name: ");
-        String state = io.readString("Enter Customer Name: ");
-        String productType = io.readString("Enter Customer Name: ");
+        String state = io.readString("Enter state: ");
+        String productType = io.readString("Enter product type: ");
         BigDecimal area = io.readBigDecimal("Enter Area: ");
         LocalDate date = io.readDate("Enter the order date: ");
 

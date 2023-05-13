@@ -12,4 +12,6 @@ public interface ClassFlooringMasteryServiceLayer {
     List<Order> getAllOrders() throws Exception;
 
     void completeOrderFields(Order curOrder);
+
+    void loadOrders() throws Exception;
 }

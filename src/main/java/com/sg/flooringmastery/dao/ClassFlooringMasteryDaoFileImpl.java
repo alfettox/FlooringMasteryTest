@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.sg.flooringmastery.dto.Order.setGlobalOrderNumber;
+
 /**
  * Giovanni De Franceschi
  * Wiley Edge
@@ -66,7 +68,7 @@ public class ClassFlooringMasteryDaoFileImpl implements ClassFlooringMasteryDao 
     }
 
     @Override
-    public List<Order> getAllOrders() throws Exception{
+    public List<Order> getAllOrders() throws Exception {
         loadOrders();
         return new ArrayList<>(ordersMap.values());
     }
@@ -76,27 +78,37 @@ public class ClassFlooringMasteryDaoFileImpl implements ClassFlooringMasteryDao 
         return null;
     }
 
-    private void loadOrders() throws Exception {
-        loadTaxes();
-        loadProducts();
+    public void loadOrders() throws Exception {
         try {
+            loadTaxes();
+            loadProducts();
+
+
             scanner = new Scanner(new BufferedReader(new FileReader(ORDERS_FILE)));
-        } catch (FileNotFoundException e) {
-            throw new Exception(
-                    "-_- Could not load roster data into memory.", e);
-        }
-        String curLine;
-        Order curOrder;
-        if (scanner.hasNextLine()) { // Skip 1st line
-            scanner.nextLine();
-        }
-        while (scanner.hasNextLine()) {
-            curLine = scanner.nextLine();
-            curOrder = unmarshallOrder(curLine);
-            setTaxes(curOrder);
-            ordersMap.put(curOrder.getOrderNumber(), curOrder);
-        }
-        scanner.close();
+
+            String curLine;
+            Order curOrder;
+            if (scanner.hasNextLine()) { // Skip 1st line
+                scanner.nextLine();
+            }
+            setGlobalOrderNumber(0);
+            while (scanner.hasNextLine()) {
+                curLine = scanner.nextLine();
+                curOrder = unmarshallOrder(curLine);
+                setTaxes(curOrder);
+                ordersMap.put(curOrder.getOrderNumber(), curOrder);
+            setGlobalOrderNumber(curOrder.getOrderNumber());
+            }
+            scanner.close();
+        } catch (Exception e){
+//                io.print("-_- Could not load roster data into memory.", e.getMessage());
+    }
+
+}
+
+    @Override
+    public void saveOrder(Order curOrder) {
+        ordersMap.put(curOrder.getOrderNumber(),curOrder);
     }
 
     private Order unmarshallOrder(String curLine) {
@@ -140,18 +152,18 @@ public class ClassFlooringMasteryDaoFileImpl implements ClassFlooringMasteryDao 
         LocalDate date = LocalDate.parse(dateStr, formatter);
 
         return new Order(orderNumber,
-                        date,
-                        customerName,
-                        state,
-                        taxRate,
-                        productType,
-                        area,
-                        costPerSquareFoot,
-                        laborCostPerSquareFoot,
-                        materialCost,
-                        laborCost,
-                        tax,
-                        total
+                date,
+                customerName,
+                state,
+                taxRate,
+                productType,
+                area,
+                costPerSquareFoot,
+                laborCostPerSquareFoot,
+                materialCost,
+                laborCost,
+                tax,
+                total
         );
     }
 

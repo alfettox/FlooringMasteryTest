@@ -23,6 +23,7 @@ public class Order {
     private BigDecimal tax;
     private BigDecimal total;
 
+    //Constructor to read from file with all fields
     public Order(int orderNumber, LocalDate date, String customerName, String state, BigDecimal taxRate, String productType, BigDecimal area, BigDecimal costPerSquareFoot, BigDecimal laborCostPerSquareFoot, BigDecimal materialCost, BigDecimal laborCost, BigDecimal tax, BigDecimal total) {
         if (globalOrderNumber >= orderNumber) {
             orderNumber = globalOrderNumber++;
@@ -43,9 +44,9 @@ public class Order {
         this.total = total;
     }
 
+    //Constructor to add Order by user
     public Order(String customerName, String state, String productType, BigDecimal area, LocalDate date) {
-        this.orderNumber = globalOrderNumber++;
-        globalOrderNumber++;
+        this.orderNumber = ++globalOrderNumber;
         this.customerName = customerName;
         this.state = state;
         this.productType = productType;

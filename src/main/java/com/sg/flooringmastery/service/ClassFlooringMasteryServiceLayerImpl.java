@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import com.sg.flooringmastery.dao.ClassFlooringMasteryDao;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -32,14 +33,21 @@ public class ClassFlooringMasteryServiceLayerImpl implements ClassFlooringMaster
     }
 
     public void completeOrderFields(Order curOrder) {
+        String pType = curOrder.getProductType();
+        System.out.println(dao.getStatesMap().get(curOrder.getState()).getTaxRate());
         curOrder.setTaxRate(dao.getStatesMap().get(curOrder.getState()).getTaxRate());
-        curOrder.setCostPerSquareFoot((dao.getProductsMap().get(curOrder.getProductType()).getLaborCostPerSquareFoot()
-                .add(dao.getProductsMap().get(curOrder.getProductType()).getMaterialCostPerSquareFoot())));
-        curOrder.setLaborCostPerSquareFoot(dao.getProductsMap().get(curOrder.getProductType()).getLaborCostPerSquareFoot());
-        curOrder.setMaterialCost((dao.getProductsMap().get(curOrder.getProductType()).getMaterialCostPerSquareFoot()).multiply(curOrder.getArea()));
+        curOrder.setCostPerSquareFoot((dao.getProductsMap().get(pType).getLaborCostPerSquareFoot()
+                .add(dao.getProductsMap().get(pType).getMaterialCostPerSquareFoot())));
+        curOrder.setLaborCostPerSquareFoot(dao.getProductsMap().get(pType).getLaborCostPerSquareFoot());
+        curOrder.setMaterialCost((dao.getProductsMap().get(pType).getMaterialCostPerSquareFoot()).multiply(curOrder.getArea()));
         curOrder.setLaborCost(curOrder.getLaborCostPerSquareFoot().multiply(curOrder.getArea()));
         curOrder.setTax(curOrder.getTaxRate().multiply(curOrder.getMaterialCost().add(curOrder.getLaborCost())));
         curOrder.setTotal(curOrder.getLaborCost().add(curOrder.getMaterialCost()).add(curOrder.getTax()));
+        dao.saveOrder(curOrder);
+    }
 
+    @Override
+    public void loadOrders() throws Exception {
+        dao.loadOrders();
     }
 }
