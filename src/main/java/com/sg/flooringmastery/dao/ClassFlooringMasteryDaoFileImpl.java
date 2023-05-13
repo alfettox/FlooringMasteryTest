@@ -6,10 +6,7 @@ import com.sg.flooringmastery.dto.State;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -35,12 +32,22 @@ public class ClassFlooringMasteryDaoFileImpl implements ClassFlooringMasteryDao 
     private static Map<Integer, Order> ordersMap = new HashMap<Integer, Order>();
     private static Map<String, State> statesMap = new HashMap<String, State>();
 
+    public static void setOrdersMap(Map<Integer, Order> ordersMap) {
+        ClassFlooringMasteryDaoFileImpl.ordersMap.clear();
+        ClassFlooringMasteryDaoFileImpl.ordersMap = ordersMap;
+    }
+
     public Map<String, State> getStatesMap() {
         return statesMap;
     }
 
     public Map<String, Product> getProductsMap() {
         return productsMap;
+    }
+
+    @Override
+    public Order getOrder(int orderNumber) {
+        return ordersMap.get(orderNumber);
     }
 
     private static Map<String, Product> productsMap = new HashMap<String, Product>();
@@ -58,18 +65,17 @@ public class ClassFlooringMasteryDaoFileImpl implements ClassFlooringMasteryDao 
     }
 
     @Override
-    public Order getOrder() {
-        return null;
-    }
-
-    @Override
-    public Order removeOrder() {
-        return null;
+    public Order removeOrder(int orderNumber) throws Exception {
+        ordersMap.remove(orderNumber);
+        for(Order x : getAllOrders()){
+            System.out.println(x.getCustomerName());
+        }
+        return getOrder(orderNumber);
     }
 
     @Override
     public List<Order> getAllOrders() throws Exception {
-        loadOrders();
+
         return new ArrayList<>(ordersMap.values());
     }
 
@@ -109,6 +115,18 @@ public class ClassFlooringMasteryDaoFileImpl implements ClassFlooringMasteryDao 
     @Override
     public void saveOrder(Order curOrder) {
         ordersMap.put(curOrder.getOrderNumber(),curOrder);
+    }
+
+    @Override
+    public Order editOrder(Order order) throws Exception {
+        List<Order> listOrders = new ArrayList<>(ordersMap.values());
+        Order filteredOrder = listOrders.stream()
+                .filter(o -> o.getOrderNumber() == (order.getOrderNumber()))
+                .findFirst()
+                .orElse(null);
+        Order newOrder = ordersMap.replace(order.getOrderNumber(), filteredOrder);
+        saveOrder(newOrder);
+        return newOrder;
     }
 
     private Order unmarshallOrder(String curLine) {
@@ -231,4 +249,75 @@ public class ClassFlooringMasteryDaoFileImpl implements ClassFlooringMasteryDao 
         }
 
     }
+
+    public void writeOrder() throws Exception {
+        List<Order> orderList = this.getAllOrders();
+        DateTimeFormatter formatterOut = DateTimeFormatter.ofPattern("MMddyyyy");
+        LocalDate dateStr;
+        for (Order curOrder : orderList) {
+            dateStr = curOrder.getDate();
+            String fileName = "Orders_" + dateStr.format(formatter) + ".txt";
+            File orderFile = new File("Orders", fileName);
+            if (!orderFile.getParentFile().exists()) {
+                if (!orderFile.getParentFile().mkdirs()) {
+                    throw new ClassFlooringMasteryPersistenceException(
+                            "Can't make the directory structure.");
+                }
+            }
+
+            try (FileWriter out = new FileWriter(orderFile, true)) {
+                String orderAsText = marshallOrder(curOrder);
+                out.write(orderAsText);
+                out.write(curOrder.getDate().format(formatterOut));
+                out.write("\n");
+                out.flush();
+            } catch (IOException e) {
+                throw new ClassFlooringMasteryPersistenceException("Error: can't write to file.");
+            }
+        }
+    }
+
+    private String marshallOrder(Order order) {
+        String orderAsText;
+
+        //Index 0 - int orderNumber
+        orderAsText = order.getOrderNumber() + DELIMITER;
+
+        // Index 1 - String customerName
+        orderAsText += order.getCustomerName() + DELIMITER;
+
+        // Index 2 - String State
+        orderAsText += order.getState() + DELIMITER;
+
+        //Index 3 - BigDecimal taxRATE
+        orderAsText += order.getTaxRate() + DELIMITER;
+
+        //Index 4 - String productType
+        orderAsText += order.getProductType() + DELIMITER;
+
+        //Index 5 - BigDecimal area
+        orderAsText += order.getArea() + DELIMITER;
+
+        //Index 6 - BigDecimal costPerSquareFoot
+        orderAsText += order.getCostPerSquareFoot() + DELIMITER;
+
+        //Index 7 - BigDecimal laborCostPerSquareFoot
+        orderAsText += order.getLaborCostPerSquareFoot() + DELIMITER;
+
+        //Index 8 - BigDecimal materialCost
+        orderAsText += order.getMaterialCost() + DELIMITER;
+
+        //Index 9 - BigDecimal laborCost
+        orderAsText += order.getLaborCost() + DELIMITER;
+
+        //Index 10 - BigDecimal tax
+        orderAsText += order.getTax() + DELIMITER;
+
+        //Index 11 - BigDecimal total
+        orderAsText += order.getTotal() + DELIMITER;
+
+        return orderAsText;
+    }
 }
+
+

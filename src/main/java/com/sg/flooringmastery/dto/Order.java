@@ -72,14 +72,15 @@ public class Order {
 
 
     public String toString() {
-        return "Order { " + "Order number: " + this.orderNumber +
-                ", customer name: " + this.customerName +
+        return "Order { " + "Order num: " + this.orderNumber +
+                ", cus. name: " + this.customerName +
+                ", date: " + this.date +
                 ", state:" + this.state +
                 ", tax rate: " + this.taxRate +
-                ", product type: " + this.productType +
+                ", prod. type: " + this.productType +
                 ", area: " + this.area +
-                ", cost per square foot: " + this.costPerSquareFoot +
-                ", labor cost per square foot: " + this.laborCostPerSquareFoot +
+                ", cost per sq. foot: " + this.costPerSquareFoot +
+                ", labor cost per sq. foot: " + this.laborCostPerSquareFoot +
                 ", material cost: " + this.materialCost +
                 ", labor cost: " + this.laborCost +
                 ", tax: " + this.tax +

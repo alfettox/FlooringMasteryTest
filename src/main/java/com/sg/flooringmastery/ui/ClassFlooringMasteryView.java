@@ -74,10 +74,72 @@ public class ClassFlooringMasteryView {
         return curOrder;
     }
 
+    public int getOrderNumber() {
+        return io.readInt("Enter Order Number:");
+    }
+
+    public LocalDate getDate() {
+        return io.readDate("Please enter a date with the following format MM/dd/yyyy");
+    }
+
+    public Order editAnOrder(Order order) {
+        System.out.println(order.getDate());
+        System.out.println(order.getOrderNumber());
+        BigDecimal area100 = BigDecimal.valueOf(100);
+        io.print(order.getCustomerName());
+        String cName = io.readString("Enter Customer Name: ");
+
+        order.setCustomerName(cName);
+        io.print("State: " + order.getState());
+        String state = io.readString("Enter State Name: ");
+        if (state.length() == 0) ;// do nothing
+        order.setState(state);
+
+        io.print("Product Type: " + order.getProductType());
+        String productType = io.readString("Enter Product Type: ");
+        order.setProductType(productType);
+        io.print("Area: " + order.getArea());
+        String area = io.readString("Enter Area: ");
+        BigDecimal pArea = BigDecimal.valueOf(Long.parseLong(area));
+        order.setArea(pArea);
+        return order;
+    }
+
+    private boolean isValidName(String s) {
+        if (s.equals(" ") || s.length() == 0) return false;
+        char c;
+        for (int i = 0; i < s.length(); i++) {
+            c = s.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == ',' || c == '.') return true;
+        }
+        return false;
+    }
+
+    public Order removeAnOrder(List<Order> ordersList) {
+        LocalDate userInpDate = io.readDate("Please enter the Order Date: (MM/dd/yyyy)");
+        int orderNumber = io.readInt("Please enter the Order Number: ");
+        for (Order curOrder : ordersList) {
+            if (curOrder.getOrderNumber() == orderNumber && curOrder.getDate().equals(userInpDate)) {
+                displaySingleOrder(curOrder);
+                String inp = io.readString("Are you sure? (Y/N)");
+                if (inp.equalsIgnoreCase("Y")) {
+                    ordersList.remove(curOrder);
+                    displaySingleOrder(curOrder);
+//                    displayOrderRemovedBanner();
+                    return curOrder;
+                } else {
+//                    displayOrderNotRemovedBanner();
+                }
+                break;
+            }
+        }
+        return null;
+    }
+}
+
 
 //   EDIT
 //   CustomerName
 //            State
 //    ProductType
 //            Area
-}

@@ -18,9 +18,9 @@ public interface ClassFlooringMasteryDao {
 
     Map<String, Product> getProductsMap();
 
-    Order getOrder();
+    Order getOrder(int orderNumber);
 
-    Order removeOrder();
+    Order removeOrder(int orderNumber) throws Exception;
 
     List<Order> getAllOrders() throws Exception;
 
@@ -29,4 +29,8 @@ public interface ClassFlooringMasteryDao {
     void loadOrders() throws Exception;
 
     void saveOrder(Order curOrder);
+
+    Order editOrder(Order order) throws Exception;
+
+    void writeOrder() throws Exception;
 }

@@ -1,5 +1,6 @@
 package com.sg.flooringmastery.controller;
 
+import com.sg.flooringmastery.dao.ClassFlooringMasteryPersistenceException;
 import com.sg.flooringmastery.dto.Order;
 import com.sg.flooringmastery.service.ClassFlooringMasteryServiceLayer;
 import com.sg.flooringmastery.ui.ClassFlooringMasteryView;
@@ -7,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -34,33 +37,33 @@ public class ClassFlooringMasteryController {
         int menuSelection = 99;
         service.loadOrders();
 //        try {
-            do {
-                menuSelection = getMenuSelection();
-                switch (menuSelection) {
-                    case 1:
-                        getAllOrders();
-                        break;
-                    case 2:
-                        addOrder();
-                        break;
-                    case 3:
-                        EditOrder();
-                        break;
-                    case 4:
-                        removeOrder();
-                        break;
-                    case 5:
-                        exportAllData();
-                        break;
-                    case 6:
-                        exitMessage();
-                        break;
-                    default:
-                        unknownCommand();
-                }
+        do {
+            menuSelection = getMenuSelection();
+            switch (menuSelection) {
+                case 1:
+                    getAllOrders();
+                    break;
+                case 2:
+                    addOrder();
+                    break;
+                case 3:
+                    EditOrder();
+                    break;
+                case 4:
+                    removeOrder();
+                    break;
+                case 5:
+                    exportAllData();
+                    break;
+                case 6:
+                    exitMessage();
+                    break;
+                default:
+                    unknownCommand();
             }
-            while (keepGoing);
-            exitMessage();
+        }
+        while (keepGoing);
+        exitMessage();
 
 //        } catch (Exception e) {
 //            displayError(e.getMessage());
@@ -79,17 +82,24 @@ public class ClassFlooringMasteryController {
 
     }
 
-    private void EditOrder() {
-        //TODO
+    private void EditOrder() throws Exception {
+        int orderNumber = view.getOrderNumber();
+        LocalDate date = view.getDate();
+        Order order = service.validateOrderInput(date, orderNumber);
+        Order editedOrder = view.editAnOrder(order);
+        service.editOrderConfirmed(editedOrder);
     }
 
-    private void removeOrder() {
-        //TODO
+    private void removeOrder() throws Exception {
+        List<Order> ordersList = service.getAllOrders();
+        Order order = view.removeAnOrder(ordersList);
+        service.removeOrderConfirmed(order);
+        view.displayAllOrders(service.getAllOrders());
     }
 
     private void exportAllData() {
-        //TODO
-    }
+            service.exportAllData();
+        }
 
     private int getMenuSelection() {
         return view.getMenuSelection();
@@ -101,6 +111,7 @@ public class ClassFlooringMasteryController {
 
     private void exitMessage() {
         view.displayExitBanner();
+        System.exit(0);
     }
 
     private void displayError(String message) {

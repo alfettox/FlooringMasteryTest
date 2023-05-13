@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import com.sg.flooringmastery.dao.ClassFlooringMasteryDao;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -50,4 +50,37 @@ public class ClassFlooringMasteryServiceLayerImpl implements ClassFlooringMaster
     public void loadOrders() throws Exception {
         dao.loadOrders();
     }
+
+    @Override
+    public Order validateOrderInput(LocalDate date, int orderNumber) throws Exception {
+        List<Order> ordersList = dao.getAllOrders();
+        for (Order order : ordersList) {
+            if (order.getOrderNumber() == orderNumber) {
+                return dao.getOrder(order.getOrderNumber());
+            }
+        }
+        return null;
+    }
+
+
+    @Override
+    public void editOrderConfirmed(Order order) throws Exception {
+        Order editedOrder = dao.editOrder(order);
+    }
+
+    @Override
+    public void exportAllData() {
+        try{
+            dao.writeOrder();
+        } catch(Exception e){
+
+        }
+
+    }
+
+    @Override
+    public Order removeOrderConfirmed(Order order) throws Exception {
+        return dao.removeOrder(order.getOrderNumber());
+    }
 }
+
